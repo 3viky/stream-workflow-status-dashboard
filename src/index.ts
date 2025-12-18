@@ -101,17 +101,26 @@ export { DatabaseError } from './database/errors.js';
 export {
   getAllStreams,
   getStream,
-  addStream,
+  getStreamById,
+  insertStream,
+  insertStream as addStream,
   updateStream,
   completeStream,
   deleteStream,
+  touchStream,
+  getStreamsByStatus,
 } from './database/queries/streams.js';
 
 export {
   getRecentCommits,
   getStreamCommits,
   addCommit,
-  getCommitByHash,
+  insertCommit,
+  getCommitsByStream,
+  getAllCommits,
+  getCommitsCountByStream,
+  getTotalCommitsCount,
+  getCommitsCountToday,
 } from './database/queries/commits.js';
 
 export {
@@ -124,10 +133,12 @@ export {
 } from './database/queries/stats.js';
 
 export {
-  getAllPendingJobs,
-  addSummaryJob,
-  markJobComplete,
-  markJobFailed,
+  getPendingJobs,
+  queueSummaryJob,
+  getPendingJobCount,
+  getJob,
+  deleteJob,
+  type SummaryJob,
 } from './database/queries/summary-jobs.js';
 
 // ============================================================================
@@ -136,7 +147,7 @@ export {
 
 export {
   syncFromFiles,
-  type SyncResult,
+  parseStreamMarkdown,
 } from './services/sync-service.js';
 
 export {
@@ -151,7 +162,9 @@ export {
 
 export {
   scanAllWorktreeCommits,
-  scanStreamWorktree,
+  scanStreamCommits,
+  getWorktreeCommits,
+  getMainBranchCommits,
 } from './scanners/git-commits.js';
 
 export {
@@ -167,8 +180,9 @@ export {
 // ============================================================================
 
 export {
-  startSummaryWorker,
-  stopSummaryWorker,
+  startWorker as startSummaryWorker,
+  processJob,
+  processPendingJobs,
 } from './jobs/summary-worker.js';
 
 // ============================================================================

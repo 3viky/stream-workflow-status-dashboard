@@ -88,7 +88,7 @@ async function main(): Promise<void> {
     console.error('[Startup] Syncing streams from plan files...');
     try {
       const syncResult = await syncFromFiles(db, projectRoot, worktreeRoot);
-      console.error(`[Startup] Synced ${syncResult.added} added, ${syncResult.updated} updated, ${syncResult.removed} removed`);
+      console.error(`[Startup] Synced ${syncResult.synced} synced, ${syncResult.skipped} skipped, ${syncResult.errors} errors`);
     } catch (error) {
       console.error('[Startup] Warning: Sync failed:', error);
     }

@@ -144,7 +144,7 @@ export class StreamStatusHttpClient {
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
+        const errorData = await response.json().catch(() => ({})) as { error?: string; details?: string };
         throw new HttpClientError(
           errorData.error || `HTTP ${response.status}`,
           response.status,
@@ -152,7 +152,7 @@ export class StreamStatusHttpClient {
         );
       }
 
-      return await response.json();
+      return await response.json() as T;
     } finally {
       clearTimeout(timeoutId);
     }
