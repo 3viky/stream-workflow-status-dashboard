@@ -11,9 +11,11 @@ import {
   updateStream,
   completeStream,
   deleteStream,
+  insertStream,
 } from '../../database/queries/streams.js';
 import { addHistoryEvent } from '../../database/queries/history.js';
 import { retireStream } from '../../services/retirement-service.js';
+import { notifyUpdate } from '../events.js';
 
 export function createStreamsRouter(db: Database.Database, config: ApiServerConfig): RouterType {
   const router: RouterType = Router();
@@ -36,6 +38,61 @@ export function createStreamsRouter(db: Database.Database, config: ApiServerConf
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       res.status(500).json({ error: 'Failed to fetch streams', details: errorMessage });
+    }
+  });
+
+  router.post('/', (req, res) => {
+    try {
+      const { streamId, streamNumber, title, category, priority, worktreePath, branch, estimatedPhases } = req.body;
+
+      // Validate required fields
+      if (!streamId || !streamNumber || !title || !category || !priority || !worktreePath || !branch) {
+        return res.status(400).json({
+          error: 'Missing required fields',
+          details: 'streamId, streamNumber, title, category, priority, worktreePath, and branch are required',
+        });
+      }
+
+      // Check if stream already exists
+      const existing = getStream(db, streamId);
+      if (existing) {
+        return res.status(409).json({
+          error: 'Stream already exists',
+          details: `Stream ${streamId} is already registered in database`,
+        });
+      }
+
+      // Create stream
+      const now = new Date().toISOString();
+      insertStream(db, {
+        id: streamId,
+        streamNumber,
+        title,
+        category,
+        priority,
+        status: 'initializing',
+        progress: 0,
+        currentPhase: undefined,
+        worktreePath,
+        branch,
+        blockedBy: undefined,
+        createdAt: now,
+        updatedAt: now,
+        completedAt: undefined,
+        phases: estimatedPhases || [],
+      });
+
+      // Notify dashboard of new stream via SSE
+      notifyUpdate('streams');
+
+      res.status(201).json({
+        success: true,
+        streamId,
+        message: 'Stream registered successfully',
+      });
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      res.status(500).json({ error: 'Failed to register stream', details: errorMessage });
     }
   });
 
