@@ -82,5 +82,10 @@
     "pnpm": ">=8.0.0"
   },
   "author": "Victoria Lackey <VictoriaLackey@pm.me>",
-  "license": "MIT"
+  "license": "MIT",
+  "_": {
+    "registry": "github",
+    "publish": false,
+    "build": true
+  }
 }
